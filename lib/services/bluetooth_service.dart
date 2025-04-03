@@ -1,5 +1,7 @@
 import 'package:blue_thermal_printer/blue_thermal_printer.dart'; // Import the blue_thermal_printer package
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image/image.dart' as img;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BluetoothPrinterService {
@@ -82,6 +84,20 @@ class BluetoothPrinterService {
       );
       _connectedDevice = device;
     }
+  }
+
+  Future<Uint8List> loadImageAsBytes(String assetPath) async {
+    ByteData data = await rootBundle.load(assetPath);
+    Uint8List bytes = data.buffer.asUint8List();
+    img.Image? image = img.decodeImage(bytes);
+    // Resize image (adjust width to match printer's resolution)
+    int targetWidth = 300; // Change this based on your printer specs
+    img.Image resizedImage = img.copyResize(image!, width: targetWidth);
+
+    img.Image grayscaleImage = img.grayscale(
+      resizedImage,
+    ); // Convert to grayscale
+    return Uint8List.fromList(img.encodeBmp(grayscaleImage)); // Encode to BMP
   }
 
   // Get the list of devices

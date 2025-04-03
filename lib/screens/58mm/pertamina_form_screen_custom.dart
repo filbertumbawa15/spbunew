@@ -1,22 +1,22 @@
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:bon/services/bluetooth_service.dart';
-import 'package:bon/widgets/print_preview_dialog.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
-import 'package:image/image.dart' as img; // Import the image package
+import 'package:image/image.dart' as imgnya;
 
-class PertaminaFormScreen extends StatefulWidget {
-  const PertaminaFormScreen({super.key});
+class PertaminaFormScreenCustom extends StatefulWidget {
+  const PertaminaFormScreenCustom({super.key});
 
   @override
-  State<PertaminaFormScreen> createState() => _PertaminaFormScreenState();
+  State<PertaminaFormScreenCustom> createState() =>
+      _PertaminaFormScreenCustomState();
 }
 
-class _PertaminaFormScreenState extends State<PertaminaFormScreen> {
+class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
   final _formKey = GlobalKey<FormState>();
 
   // Form field controllers
@@ -57,7 +57,7 @@ class _PertaminaFormScreenState extends State<PertaminaFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Pertamina Fuel Receipt')),
+      appBar: AppBar(title: const Text('Pertamina Fuel Receipt Custom')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -421,6 +421,96 @@ class _PertaminaFormScreenState extends State<PertaminaFormScreen> {
     );
   }
 
+  Future<Uint8List?> createTextImage(Map<String, dynamic> content) async {
+    // Create a recorder and canvas to capture the drawing of the text
+    final recorder = ui.PictureRecorder();
+    double totalHeight = 0;
+    double maxWidth = 0;
+    List<TextPainter> textPainters = [];
+    TextPainter textPainter;
+
+    // Create TextPainters for each line of text and calculate the total height
+    content.forEach((key, value) {
+      // Determine font size based on key (conditional font size for 'SPBU';
+      if (key == "header") {
+        textPainter = TextPainter(
+          text: TextSpan(
+            text: "$value", // Key and value as string
+            style: GoogleFonts.ptSerif(
+              fontSize: 30,
+              color: Colors.black,
+            ),
+          ),
+          textDirection: ui.TextDirection.ltr,
+          textAlign: TextAlign.center,
+        );
+      } else {
+        textPainter = TextPainter(
+          text: TextSpan(
+            text: "$value", // Key and value as string
+            style: GoogleFonts.ptSerif(
+              fontSize: 20,
+              color: Colors.black,
+            ),
+          ),
+          textDirection: ui.TextDirection.ltr,
+          textAlign: TextAlign.left,
+        );
+      }
+
+      textPainter.layout(minWidth: 0, maxWidth: double.infinity);
+      textPainters.add(textPainter);
+      totalHeight += textPainter.height;
+      maxWidth = maxWidth > textPainter.width ? maxWidth : textPainter.width;
+    });
+
+    // Create a canvas with a size large enough to fit all the text
+    final canvas = Canvas(
+      recorder,
+      Rect.fromPoints(
+        const Offset(0, 0),
+        Offset(maxWidth, totalHeight),
+      ),
+    );
+
+    // Paint each TextPainter (line of text) onto the canvas
+    double currentHeight = 0;
+    for (var textPainter in textPainters) {
+      // For SPBU, we center the text, otherwise, we align it left
+      if (textPainter.text?.toPlainText().contains("14201167") ?? false) {
+        // Calculate the offset to center the text
+        double centerOffset = (maxWidth - textPainter.width) / 2;
+        textPainter.paint(canvas, Offset(centerOffset, currentHeight));
+      } else if (textPainter.text?.toPlainText().contains("SPBU") ?? false) {
+        // Calculate the offset to center the text
+        double centerOffset = (maxWidth - textPainter.width) / 2;
+        textPainter.paint(canvas, Offset(centerOffset, currentHeight));
+      } else if (textPainter.text?.toPlainText().contains("JL.") ?? false) {
+        // Calculate the offset to center the text
+        double centerOffset = (maxWidth - textPainter.width) / 2;
+        textPainter.paint(canvas, Offset(centerOffset, currentHeight));
+      } else {
+        textPainter.paint(canvas, Offset(0, currentHeight)); // Align left
+      }
+      currentHeight += textPainter.height;
+    }
+
+    // End recording and create a picture
+    final picture = recorder.endRecording();
+
+    // Convert the picture to an image
+    final img = await picture.toImage(
+      maxWidth.toInt(),
+      totalHeight.toInt(),
+    );
+
+    // Convert the image to PNG bytes
+    final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+
+    // Return the bytes as a Uint8List
+    return byteData?.buffer.asUint8List();
+  }
+
   // Method to print the receipt
   void printReceipt({String? flag}) async {
     BluetoothDevice? device = _bluetoothPrinterService.connectedDevice;
@@ -428,102 +518,76 @@ class _PertaminaFormScreenState extends State<PertaminaFormScreen> {
     final profile = await CapabilityProfile.load();
     final generator = Generator(paper, profile);
     final List<int> bytes = [];
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
 
     Uint8List imageBytes =
         await _bluetoothPrinterService.loadImageAsBytes('assets/Pertamina.png');
 
-    if (flag == "Preview") {
-    } else {
-      if (device != null) {
-        _bluetoothPrinterService.printer.printNewLine();
-        _bluetoothPrinterService.printer.printImageBytes(imageBytes);
-        bytes.addAll(generator.text(_transactionNumberController.text,
-            styles: const PosStyles(
-                align: PosAlign.center,
-                height: PosTextSize.size2,
-                width: PosTextSize.size2,
-                bold: true)));
-        _bluetoothPrinterService.printer.writeBytes(Uint8List.fromList(bytes));
+    Map<String, dynamic> content = {
+      'header': '14201167',
+      'spbuname': 'SPBU AH NASUTION/IRITURA',
+      'road': 'JL. AH NASUTION/TRITURA NO. 6A',
+      'shift': 'Shift: 1                  No. Trans: 5095616',
+      'waktu': 'Waktu: 27/03/2025 07:39:03',
+      'sepa1': '--------------------------------',
+      'pulaupompa': 'Pulau/Pompa: 2',
+      'namaproduk': 'Nama Produk: PERTALITE',
+      'hargaliter': 'Harga/Liter: Rp. 10,000',
+      'a': 'Volume: (L) 30.000',
+      'b': 'Total Harga: Rp. 300,000',
+      'c': 'Operator: ANDRI',
+      'sepa2': '--------------------------------',
+      'cash': 'CASH',
+      'cashvalue': '300,000',
+      'sepa3': '--------------------------------',
+      'plat': 'No. Plat: BK1606AEC',
+      'ket':
+          'Subsidi bulan November 2023: Bio\nsolar Rp 7,050/liter Dan Pertali\nte Rp 2,200/liter\nMari gunakan Pertamax series Dan\n  Dex series\nSubsidi hanya untuk yang berhak \nmenerimanya.'
+    };
 
-        _bluetoothPrinterService.printer
-            .printCustom("SPBU ${_spbuController.text}", 0, 1);
-        _bluetoothPrinterService.printer
-            .printCustom(_alamatSpbuController.text, 0, 1);
-        _bluetoothPrinterService.printer.printCustom(
-          "Shift: $_shift    No. Trans: ${_noTransController.text}",
-          0,
-          1,
-        );
-        _bluetoothPrinterService.printer
-            .printCustom(" Waktu: $formattedDate", 0, 0);
-        _bluetoothPrinterService.printer
-            .printCustom("--------------------------------", 0, 1);
+    final bytenya = await createTextImage(content);
 
-        // Print dynamic input data from the form
-        _bluetoothPrinterService.printer
-            .printCustom("Pulau/Pompa: ${_pompaController.text}", 0, 0);
-        _bluetoothPrinterService.printer
-            .printCustom("Nama Produk: ${_produk.toUpperCase()}", 0, 0);
-        _bluetoothPrinterService.printer.printCustom(
-            "Harga/Liter: Rp. ${_hargaPerLiterController.text}", 0, 0);
-        _bluetoothPrinterService.printer
-            .printCustom("Volume     : (L) ${_volumeController.text}", 0, 0);
-        _bluetoothPrinterService.printer.printCustom(
-            "Total Harga: Rp. ${_totalHargaController.text}", 0, 0);
-        _bluetoothPrinterService.printer
-            .printCustom("Operator   : ${_operatorController.text}", 0, 0);
+    // textPainter.layout();
+    // textPainter.paint(canvas, const Offset(0, 0));
 
-        _bluetoothPrinterService.printer
-            .printCustom("--------------------------------", 0, 1);
-        _bluetoothPrinterService.printer.printCustom("CASH", 0, 0);
-        _bluetoothPrinterService.printer
-            .printCustom(_cashController.text, 0, 2);
-        if (useChange && _changeController.text.isNotEmpty) {
-          _bluetoothPrinterService.printer.printCustom("CHANGE", 0, 0);
-          _bluetoothPrinterService.printer
-              .printCustom(_changeController.text, 0, 2);
-        }
-        _bluetoothPrinterService.printer
-            .printCustom("--------------------------------", 0, 1);
-        _bluetoothPrinterService.printer
-            .printCustom("No. Plat   : ${_noPlatController.text}", 0, 0);
-        _bluetoothPrinterService.printer
-            .printCustom("--------------------------------", 0, 1);
-        if (_selectedOptionKeterangan == '1') {
-          _bluetoothPrinterService.printer
-              .printCustom("Anda menggunakan subsidi BBM dar", 0, 1);
-          _bluetoothPrinterService.printer
-              .printCustom("i negara : Biosolar Rp 4.965/lit", 0, 1);
-          _bluetoothPrinterService.printer
-              .printCustom("er dan Pertalite Rp 1.512/liter ", 0, 1);
-          _bluetoothPrinterService.printer
-              .printCustom("untuk tidak disalahgunakan. Mari", 0, 1);
-          _bluetoothPrinterService.printer
-              .printCustom(" gunakan Pertamax series dan Dex", 0, 1);
-          _bluetoothPrinterService.printer
-              .printCustom(" series. subsidi hanya untuk yan", 0, 1);
-          _bluetoothPrinterService.printer.printCustom("g", 0, 1);
-          _bluetoothPrinterService.printer
-              .printCustom("berhak menerimanya.", 0, 1);
-        } else if (_selectedOptionKeterangan == '2') {
-          _bluetoothPrinterService.printer
-              .printCustom("Subsidi Februari 2024 : Bio Sol ", 0, 1);
-          _bluetoothPrinterService.printer
-              .printCustom("ar Rp 5.233/Liter dan Pertalite ", 0, 1);
-          _bluetoothPrinterService.printer.printCustom("Rp 1.301/Liter", 0, 1);
-          _bluetoothPrinterService.printer
-              .printCustom("Mari gunakan Pertamax Series Dan", 0, 1);
-          _bluetoothPrinterService.printer.printCustom("Dex Series", 0, 1);
-          _bluetoothPrinterService.printer
-              .printCustom("Subsidi hanya untuk yang berhak ", 0, 1);
-          _bluetoothPrinterService.printer
-              .printCustom("menerimanya. TERIMA KASIH", 0, 1);
-        }
+    // final picture = recorder.endRecording();
+    // final img = await picture.toImage(
+    //     textPainter.width.toInt(), textPainter.height.toInt());
+    // final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+    // final bytenya = byteData?.buffer.asUint8List();
 
-        _bluetoothPrinterService.printer.printNewLine();
-        _bluetoothPrinterService.printer.printNewLine();
-        _bluetoothPrinterService.printer.paperCut();
-      }
+    if (bytenya != null) {
+      showGeneralDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierLabel: 'Close',
+        transitionDuration: const Duration(milliseconds: 200),
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Material(
+              color: Colors.white.withOpacity(0.9),
+              child: Center(
+                child: GestureDetector(
+                  onTap: () {}, // Prevent dismiss when tapping the image itself
+                  child: Image.memory(bytenya),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+      // imgnya.Image? imageNya = imgnya.decodeImage(bytenya);
+      // _bluetoothPrinterService.printer.printImageBytes(imageBytes);
+      // bytes.addAll(generator.image(imageNya!));
+      // bytes.addAll(generator.feed(2));
+      // bytes.addAll(generator.cut());
+      // _bluetoothPrinterService.printer.writeBytes(Uint8List.fromList(bytes));
+      // // ui.decodeImageFromList(imageData, (ui.Image uiImg) {
+      // //   // Convert the ui.Image to an image package Image
+      // //   img.Image imagePackageImg = _convertUiImageToImagePackageImage(uiImg);
+      // // });
     }
   }
 }

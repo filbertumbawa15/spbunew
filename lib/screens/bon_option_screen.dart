@@ -1,9 +1,10 @@
 import 'package:bon/screens/58mm/pertamina_form_screen.dart';
+import 'package:bon/screens/58mm/pertamina_form_screen_custom.dart';
 import 'package:flutter/material.dart';
 
 class BonOptionsScreen extends StatelessWidget {
   final String printerSize;
-  final List<String> bonOptions = ['Pertamina BON', 'Railway BON', 'Cafe BON'];
+  final List<String> bonOptions = ['Pertamina BON', 'Pertamina BON Custom'];
 
   BonOptionsScreen({super.key, required this.printerSize});
 
@@ -22,24 +23,54 @@ class BonOptionsScreen extends StatelessWidget {
               style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 20),
-            ...bonOptions.map((bon) => ListTile(
-                  title: Text(bon),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    if (bon == 'Pertamina BON') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PertaminaFormScreen(),
+            ...bonOptions.map(
+              (bon) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 15.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white, // Background color of the container
+                      borderRadius:
+                          BorderRadius.circular(10), // Rounded corners
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2), // Shadow color
+                          spreadRadius: 5, // How much the shadow spreads
+                          blurRadius: 10, // How blurry the shadow is
+                          offset: const Offset(
+                              0, 4), // Position of the shadow (x, y)
                         ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('$bon selected')),
-                      );
-                    }
-                  },
-                )),
+                      ],
+                    ),
+                    child: ListTile(
+                      title: Text(bon),
+                      onTap: () {
+                        if (bon == 'Pertamina BON') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PertaminaFormScreen(),
+                            ),
+                          );
+                        } else if (bon == 'Pertamina BON Custom') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const PertaminaFormScreenCustom(),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('$bon selected')),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
