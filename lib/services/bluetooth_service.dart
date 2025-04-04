@@ -91,8 +91,9 @@ class BluetoothPrinterService {
     Uint8List bytes = data.buffer.asUint8List();
     img.Image? image = img.decodeImage(bytes);
     // Resize image (adjust width to match printer's resolution)
-    int targetWidth = 300; // Change this based on your printer specs
-    img.Image resizedImage = img.copyResize(image!, width: targetWidth);
+    int targetWidth = 200; // Change this based on your printer specs
+    img.Image resizedImage =
+        img.copyResize(image!, width: targetWidth, height: 65);
 
     img.Image grayscaleImage = img.grayscale(
       resizedImage,
