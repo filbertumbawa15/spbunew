@@ -72,7 +72,7 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
               TextFormField(
                 controller: _transactionNumberController,
                 decoration: const InputDecoration(
-                  labelText: 'No. Transaksi',
+                  labelText: 'No. Depot',
                   border: OutlineInputBorder(),
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -141,7 +141,7 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
               TextFormField(
                 controller: _noTransController,
                 decoration: const InputDecoration(
-                  labelText: 'No. Trans',
+                  labelText: 'No. Trans (Max: 7)',
                   border: OutlineInputBorder(),
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -337,41 +337,42 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
               const SizedBox(height: 16),
 
               //Keterangan
-              const Text(
-                'Pilih jenis keterangan yang ingin digunakan:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              ListTile(
-                title: const Text(
-                  'Anda menggunakan subsidi BBM dari negara : Biosolar Rp 4.965/liter dan Pertalite Rp 1.512/liter untuk tidak disalahgunakan. '
-                  'Mari gunakan Pertamax series dan Dex series. Subsidi hanya untuk yang berhak menerimanya.',
-                ),
-                leading: Radio<String>(
-                  value: '1',
-                  groupValue: _selectedOptionKeterangan,
-                  onChanged: (String? value) {
-                    setState(() {
-                      _selectedOptionKeterangan = value;
-                    });
-                  },
-                ),
-              ),
-              ListTile(
-                title: const Text(
-                  'Subsidi Februari 2024 : Bio Solar Rp 5.233/Liter dan Pertalite Rp 1.301/Liter\n'
-                  'Mari gunakan Pertamax Series Dan Dex Series\n'
-                  'Subsidi hanya untuk yang berhak menerimanya. TERIMA KASIH',
-                ),
-                leading: Radio<String>(
-                  value: '2',
-                  groupValue: _selectedOptionKeterangan,
-                  onChanged: (String? value) {
-                    setState(() {
-                      _selectedOptionKeterangan = value;
-                    });
-                  },
-                ),
-              ),
+              // const Text(
+              //   'Pilih jenis keterangan yang ingin digunakan:',
+              //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              // ),
+              // ListTile(
+              //   title: const Text(
+              //     'Anda menggunakan subsidi BBM dari negara : Biosolar Rp 4.965/liter dan Pertalite Rp 1.512/liter untuk tidak disalahgunakan. '
+              //     'Mari gunakan Pertamax series dan Dex series. Subsidi hanya untuk yang berhak menerimanya.',
+              //   ),
+              //   leading: Radio<String>(
+              //     value: '1',
+              //     groupValue: _selectedOptionKeterangan,
+              //     onChanged: (String? value) {
+              //       setState(() {
+              //         _selectedOptionKeterangan = value;
+              //       });
+              //     },
+              //   ),
+              // ),
+              // ListTile(
+              //   title: const Text(
+              //     'Subsidi Februari 2024 : Bio Solar Rp 5.233/Liter dan Pertalite Rp 1.301/Liter\n'
+              //     'Mari gunakan Pertamax Series Dan Dex Series\n'
+              //     'Subsidi hanya untuk yang berhak menerimanya. TERIMA KASIH',
+              //   ),
+              //   leading: Radio<String>(
+              //     value: '2',
+              //     groupValue: _selectedOptionKeterangan,
+              //     onChanged: (String? value) {
+              //       setState(() {
+              //         _selectedOptionKeterangan = value;
+              //       });
+              //     },
+              //   ),
+              // ),
+
               const SizedBox(height: 16),
 
               ElevatedButton(
@@ -438,12 +439,12 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
             style: const TextStyle(
               fontFamily:
                   'CustomFontTwo', // Use Monospaced font for precise alignment
-              fontSize: 23,
+              fontSize: 31,
               color: Colors.black,
             ),
             children: [
               // "Shift" dan nilai-nya
-              TextSpan(text: "           $value"),
+              TextSpan(text: "        $value"),
             ],
           ),
           textDirection: ui.TextDirection.ltr,
@@ -515,17 +516,16 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
               TextSpan(text: value), // Nilai untuk "Shift"
 
               // "No. Trans" dan nilai-nya
-              const TextSpan(
-                  text: "     "), // Memberikan ruang antar kolom jika perlu
+              const TextSpan(text: "     "),
               const TextSpan(text: "No. Trans"),
-              const TextSpan(text: ": "), // Colon tetap di tempat
-              const TextSpan(text: "5095616"), // Nilai untuk "No. Trans"
+              const TextSpan(text: ": "),
+              TextSpan(text: _noTransController.text),
             ],
           ),
           textDirection: ui.TextDirection.ltr,
           textAlign: TextAlign.left,
         );
-      } else if (key == "cash" || key.contains("ket")) {
+      } else if (key == "cash" || key.contains("ket") || key == "change") {
         textPainter = TextPainter(
           text: TextSpan(
             style: const TextStyle(
@@ -542,8 +542,7 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
           textDirection: ui.TextDirection.ltr,
           textAlign: TextAlign.left,
         );
-      } else if (key == "cashvalue") {
-        print("dodo dong");
+      } else if (key.contains("tunainya")) {
         textPainter = TextPainter(
           text: TextSpan(
             style: const TextStyle(
@@ -553,7 +552,23 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
               color: Colors.black,
             ),
             children: [
-              TextSpan(text: "asdfasdf1111"),
+              TextSpan(text: "                         $value"),
+            ],
+          ),
+          textDirection: ui.TextDirection.ltr,
+          textAlign: TextAlign.left,
+        );
+      } else if (key.contains("kembaliannya")) {
+        textPainter = TextPainter(
+          text: TextSpan(
+            style: const TextStyle(
+              fontFamily:
+                  'CustomFontTwo', // Use Monospaced font for precise alignment
+              fontSize: 23,
+              color: Colors.black,
+            ),
+            children: [
+              TextSpan(text: "                         $value"),
             ],
           ),
           textDirection: ui.TextDirection.ltr,
@@ -616,26 +631,27 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
     double currentHeight = 0;
     for (var textPainter in textPainters) {
       // // For SPBU, we center the text, otherwise, we align it left
-      // if (textPainter.text?.toPlainText().contains("14201167") ?? false) {
-      //   // Calculate the offset to center the text
-      //   double centerOffset = (maxWidth - textPainter.width) / 2 * 0.88;
-      //   textPainter.paint(canvas, Offset(centerOffset, currentHeight));
-      //   textPainter.paint(
-      //       canvas, Offset(centerOffset + 0.5, currentHeight + 0.5));
-      // } else if (textPainter.text?.toPlainText().contains("SPBU") ?? false) {
-      //   // Calculate the offset to center the text
-      //   double centerOffset = (maxWidth - textPainter.width) / 2 * 0.7;
-      //   textPainter.paint(canvas, Offset(centerOffset, currentHeight));
-      // } else if (textPainter.text?.toPlainText().contains("--") ?? false) {
-      //   // Calculate the offset to center the text
-      //   double centerOffset = (maxWidth - textPainter.width) / 2 * 0.3;
-      //   textPainter.paint(canvas, Offset(centerOffset, currentHeight));
-      // } else if (textPainter.text?.toPlainText().startsWith("300,000") ??
-      //     false) {
-      //   double rightOffset = maxWidth - textPainter.width - (maxWidth * 0.0);
-      //   textPainter.paint(canvas, Offset(rightOffset, currentHeight));
-      // } else {
-      textPainter.paint(canvas, Offset(0, currentHeight));
+      if (textPainter.text?.toPlainText().contains("14201167") ?? false) {
+        // Calculate the offset to center the text
+        double centerOffset = (maxWidth - textPainter.width) / 2 * 0.88;
+        textPainter.paint(canvas, Offset(centerOffset, currentHeight));
+        textPainter.paint(
+            canvas, Offset(centerOffset + 0.5, currentHeight + 0.5));
+      } else {
+        //   // Calculate the offset to center the text
+        //   double centerOffset = (maxWidth - textPainter.width) / 2 * 0.7;
+        //   textPainter.paint(canvas, Offset(centerOffset, currentHeight));
+        // } else if (textPainter.text?.toPlainText().contains("--") ?? false) {
+        //   // Calculate the offset to center the text
+        //   double centerOffset = (maxWidth - textPainter.width) / 2 * 0.3;
+        //   textPainter.paint(canvas, Offset(centerOffset, currentHeight));
+        // } else if (textPainter.text?.toPlainText().startsWith("300,000") ??
+        //     false) {
+        //   double rightOffset = maxWidth - textPainter.width - (maxWidth * 0.0);
+        //   textPainter.paint(canvas, Offset(rightOffset, currentHeight));
+        // } else {
+        textPainter.paint(canvas, Offset(0, currentHeight));
+      }
       // }
       currentHeight += textPainter.height;
     }
@@ -670,27 +686,33 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
         await _bluetoothPrinterService.loadImageAsBytes('assets/Pertamina.png');
 
     Map<String, dynamic> content = {
-      'header': '14201167',
-      'spbuname': 'SPBU AH NASUTION/TRITURA',
-      'jl': 'JL. AH NASUTION/TRITURA NO. 6A',
-      'shift': '1',
-      'Waktu': '27/03/2025 07:39:03',
+      'header': _transactionNumberController.text,
+      'spbuname': _spbuController.text,
+      'jl': _alamatSpbuController.text,
+      'shift': _shift,
+      'Waktu': formattedDate,
       'sepa1': '----------------------------------------',
-      'Pulau/Pompa': '2',
-      'Nama Produk': 'PERTALITE',
-      'Harga/Liter': 'Rp. 10,000',
-      'Volume': '(L) 30.000',
-      'Total Harga': 'Rp. 300,000',
-      'Operator': 'ANDRI',
-      'sepa2': '-----------------------------',
+      'Pulau/Pompa': _pompaController.text,
+      'Nama Produk': _produk.toUpperCase(),
+      'Harga/Liter': "Rp. ${_hargaPerLiterController.text}",
+      'Volume': '(L) 21.510',
+      'Total Harga': "Rp. ${_totalHargaController.text}",
+      'Operator': _operatorController.text,
+      'sepa2': '----------------------------------------',
       'cash': 'CASH',
-      'tunainya': '300,000',
-      'sepa3': '-----------------------------',
-      'No. Plat': 'BK1606AEC',
-      'sepa4': '-----------------------------',
+      'tunainya': '500,000',
+    };
+    if (useChange) {
+      content['change'] = "CHANGE";
+      content['kembaliannya'] = _changeController.text;
+    }
+    content.addAll({
+      'sepa3': '----------------------------------------',
+      'No. Plat': _noPlatController.text,
+      'sepa4': '----------------------------------------',
       'ket':
           'Subsidi bulan November 2023: Bio\nsolar Rp 7,050/liter Dan Pertali\nte Rp 2,200/liter\nMari gunakan Pertamax series Dan\n  Dex series\nSubsidi hanya untuk yang berhak \nmenerimanya.'
-    };
+    });
 
     final bytenya = await createTextImage(content);
 
@@ -704,36 +726,36 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
     // final bytenya = byteData?.buffer.asUint8List();
 
     if (bytenya != null) {
-      showGeneralDialog(
-        context: context,
-        barrierDismissible: true,
-        barrierLabel: 'Close',
-        transitionDuration: const Duration(milliseconds: 200),
-        pageBuilder: (context, animation, secondaryAnimation) {
-          return GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Material(
-              color: Colors.white.withOpacity(0.9),
-              child: Center(
-                child: GestureDetector(
-                  onTap: () {}, // Prevent dismiss when tapping the image itself
-                  child: Image.memory(bytenya),
-                ),
-              ),
-            ),
-          );
-        },
-      );
-      // imgnya.Image? imageNya = imgnya.decodeImage(bytenya);
-      // _bluetoothPrinterService.printer.printImageBytes(imageBytes);
-      // bytes.addAll(generator.image(imageNya!));
-      // // bytes.addAll(generator.feed(2));
-      // // bytes.addAll(generator.cut());
-      // _bluetoothPrinterService.printer.writeBytes(Uint8List.fromList(bytes));
-      // // ui.decodeImageFromList(imageData, (ui.Image uiImg) {
-      // //   // Convert the ui.Image to an image package Image
-      // //   img.Image imagePackageImg = _convertUiImageToImagePackageImage(uiImg);
-      // // });
+      // showGeneralDialog(
+      //   context: context,
+      //   barrierDismissible: true,
+      //   barrierLabel: 'Close',
+      //   transitionDuration: const Duration(milliseconds: 200),
+      //   pageBuilder: (context, animation, secondaryAnimation) {
+      //     return GestureDetector(
+      //       onTap: () => Navigator.of(context).pop(),
+      //       child: Material(
+      //         color: Colors.white.withOpacity(0.9),
+      //         child: Center(
+      //           child: GestureDetector(
+      //             onTap: () {}, // Prevent dismiss when tapping the image itself
+      //             child: Image.memory(bytenya),
+      //           ),
+      //         ),
+      //       ),
+      //     );
+      //   },
+      // );
+      imgnya.Image? imageNya = imgnya.decodeImage(bytenya);
+      _bluetoothPrinterService.printer.printImageBytes(imageBytes);
+      bytes.addAll(generator.image(imageNya!));
+      bytes.addAll(generator.feed(2));
+      // bytes.addAll(generator.cut());
+      _bluetoothPrinterService.printer.writeBytes(Uint8List.fromList(bytes));
+      // ui.decodeImageFromList(imageData, (ui.Image uiImg) {
+      //   // Convert the ui.Image to an image package Image
+      //   img.Image imagePackageImg = _convertUiImageToImagePackageImage(uiImg);
+      // });
     }
   }
 }

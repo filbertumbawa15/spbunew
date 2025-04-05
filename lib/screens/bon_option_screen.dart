@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 
 class BonOptionsScreen extends StatelessWidget {
   final String printerSize;
-  final List<String> bonOptions = ['Pertamina BON', 'Pertamina BON Custom'];
+  final List<String> bonOptions = [
+    'Pertamina BON Format 1 (Font Bawaan Printer)',
+    'Pertamina BON Format 2 (Font Droid Sans)'
+  ];
 
   BonOptionsScreen({super.key, required this.printerSize});
 
@@ -45,14 +48,16 @@ class BonOptionsScreen extends StatelessWidget {
                     child: ListTile(
                       title: Text(bon),
                       onTap: () {
-                        if (bon == 'Pertamina BON') {
+                        if (bon ==
+                            'Pertamina BON Format 1 (Font Bawaan Printer)') {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const PertaminaFormScreen(),
                             ),
                           );
-                        } else if (bon == 'Pertamina BON Custom') {
+                        } else if (bon ==
+                            'Pertamina BON Format 2 (Font Droid Sans)') {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
