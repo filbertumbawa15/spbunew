@@ -435,16 +435,19 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
       if (key == "header") {
         textPainter = TextPainter(
           text: TextSpan(
-            text: "$value",
             style: const TextStyle(
-              letterSpacing: -1.2,
-              fontFamily: 'CustomFontTwo',
-              fontSize: 27,
+              fontFamily:
+                  'CustomFontTwo', // Use Monospaced font for precise alignment
+              fontSize: 23,
               color: Colors.black,
             ),
+            children: [
+              // "Shift" dan nilai-nya
+              TextSpan(text: "           $value"),
+            ],
           ),
           textDirection: ui.TextDirection.ltr,
-          textAlign: TextAlign.center,
+          textAlign: TextAlign.left,
         );
       } else if (key.contains("sepa")) {
         textPainter = TextPainter(
@@ -460,25 +463,117 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
           textDirection: ui.TextDirection.ltr,
           textAlign: TextAlign.center,
         );
-      } else if (key.contains("spbuname") ||
-          key.contains("jl") ||
-          key.contains("shift") ||
-          key.contains("waktu") ||
-          key.contains("cash") ||
-          key.contains("cashvalue") ||
-          key.contains("ket")) {
+      } else if (key.contains("spbuname")) {
         textPainter = TextPainter(
           text: TextSpan(
-            text: "$value", // Key and value as string
             style: const TextStyle(
-              letterSpacing: -1.5,
-              fontFamily: 'CustomFontTwo',
+              fontFamily:
+                  'CustomFontTwo', // Use Monospaced font for precise alignment
               fontSize: 23,
               color: Colors.black,
             ),
+            children: [
+              // "Shift" dan nilai-nya
+              TextSpan(text: "    $value"),
+            ],
           ),
           textDirection: ui.TextDirection.ltr,
-          textAlign: TextAlign.center,
+          textAlign: TextAlign.left,
+        );
+      } else if (key.contains("Waktu")) {
+        textPainter = TextPainter(
+          text: TextSpan(
+            style: const TextStyle(
+              fontFamily:
+                  'CustomFontTwo', // Use Monospaced font for precise alignment
+              fontSize: 23,
+              color: Colors.black,
+            ),
+            children: [
+              // "Shift" dan nilai-nya
+              const TextSpan(text: "Waktu"),
+              const TextSpan(text: ": "), // Colon tetap di tempat
+              TextSpan(text: value), // Nilai untuk "Shift"
+            ],
+          ),
+          textDirection: ui.TextDirection.ltr,
+          textAlign: TextAlign.left,
+        );
+      } else if (key.contains("shift")) {
+        textPainter = TextPainter(
+          text: TextSpan(
+            style: const TextStyle(
+              fontFamily:
+                  'CustomFontTwo', // Use Monospaced font for precise alignment
+              fontSize: 23,
+              color: Colors.black,
+            ),
+            children: [
+              // "Shift" dan nilai-nya
+              const TextSpan(text: "Shift"),
+              const TextSpan(text: ": "), // Colon tetap di tempat
+              TextSpan(text: value), // Nilai untuk "Shift"
+
+              // "No. Trans" dan nilai-nya
+              const TextSpan(
+                  text: "     "), // Memberikan ruang antar kolom jika perlu
+              const TextSpan(text: "No. Trans"),
+              const TextSpan(text: ": "), // Colon tetap di tempat
+              const TextSpan(text: "5095616"), // Nilai untuk "No. Trans"
+            ],
+          ),
+          textDirection: ui.TextDirection.ltr,
+          textAlign: TextAlign.left,
+        );
+      } else if (key == "cash" || key.contains("ket")) {
+        textPainter = TextPainter(
+          text: TextSpan(
+            style: const TextStyle(
+              fontFamily:
+                  'CustomFontTwo', // Use Monospaced font for precise alignment
+              fontSize: 23,
+              color: Colors.black,
+            ),
+            children: [
+              // "Shift" dan nilai-nya
+              TextSpan(text: value),
+            ],
+          ),
+          textDirection: ui.TextDirection.ltr,
+          textAlign: TextAlign.left,
+        );
+      } else if (key == "cashvalue") {
+        print("dodo dong");
+        textPainter = TextPainter(
+          text: TextSpan(
+            style: const TextStyle(
+              fontFamily:
+                  'CustomFontTwo', // Use Monospaced font for precise alignment
+              fontSize: 23,
+              color: Colors.black,
+            ),
+            children: [
+              TextSpan(text: "asdfasdf1111"),
+            ],
+          ),
+          textDirection: ui.TextDirection.ltr,
+          textAlign: TextAlign.left,
+        );
+      } else if (key.contains("jl")) {
+        textPainter = TextPainter(
+          text: TextSpan(
+            style: const TextStyle(
+              fontFamily:
+                  'CustomFontTwo', // Use Monospaced font for precise alignment
+              fontSize: 23,
+              color: Colors.black,
+            ),
+            children: [
+              TextSpan(text: " $value"),
+            ],
+          ),
+          textDirection: ui.TextDirection.ltr,
+          textAlign: TextAlign.left,
         );
       } else {
         textPainter = TextPainter(
@@ -501,7 +596,8 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
         );
       }
 
-      textPainter.layout(minWidth: 1000, maxWidth: 5000);
+      textPainter.layout(minWidth: 500, maxWidth: double.infinity);
+      // textPainter.layout(minWidth: 1000, maxWidth: 5000);
       textPainters.add(textPainter);
       totalHeight += textPainter.height;
       maxWidth = maxWidth > textPainter.width ? maxWidth : textPainter.width;
@@ -512,39 +608,35 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
       recorder,
       Rect.fromPoints(
         const Offset(0, 0),
-        Offset(1000, 5000),
+        Offset(maxWidth, totalHeight),
       ),
     );
 
     // Paint each TextPainter (line of text) onto the canvas
     double currentHeight = 0;
     for (var textPainter in textPainters) {
-      // For SPBU, we center the text, otherwise, we align it left
-      if (textPainter.text?.toPlainText().contains("14201167") ?? false) {
-        // Calculate the offset to center the text
-        double centerOffset = (maxWidth - textPainter.width) / 2 * 0.88;
-        textPainter.paint(canvas, Offset(centerOffset, currentHeight));
-        textPainter.paint(
-            canvas, Offset(centerOffset + 0.5, currentHeight + 0.5));
-      } else if (textPainter.text?.toPlainText().contains("SPBU") ?? false) {
-        // Calculate the offset to center the text
-        double centerOffset = (maxWidth - textPainter.width) / 2 * 0.7;
-        textPainter.paint(canvas, Offset(centerOffset, currentHeight));
-      } else if (textPainter.text?.toPlainText().contains("JL.") ?? false) {
-        // Calculate the offset to center the text
-        double centerOffset = (maxWidth - textPainter.width) / 2 * 0.3;
-        textPainter.paint(canvas, Offset(centerOffset, currentHeight));
-      } else if (textPainter.text?.toPlainText().contains("--") ?? false) {
-        // Calculate the offset to center the text
-        double centerOffset = (maxWidth - textPainter.width) / 2 * 0.3;
-        textPainter.paint(canvas, Offset(centerOffset, currentHeight));
-      } else if (textPainter.text?.toPlainText().startsWith("300,000") ??
-          false) {
-        double rightOffset = maxWidth - textPainter.width - (maxWidth * 0.01);
-        textPainter.paint(canvas, Offset(rightOffset, currentHeight));
-      } else {
-        textPainter.paint(canvas, Offset(0, currentHeight));
-      }
+      // // For SPBU, we center the text, otherwise, we align it left
+      // if (textPainter.text?.toPlainText().contains("14201167") ?? false) {
+      //   // Calculate the offset to center the text
+      //   double centerOffset = (maxWidth - textPainter.width) / 2 * 0.88;
+      //   textPainter.paint(canvas, Offset(centerOffset, currentHeight));
+      //   textPainter.paint(
+      //       canvas, Offset(centerOffset + 0.5, currentHeight + 0.5));
+      // } else if (textPainter.text?.toPlainText().contains("SPBU") ?? false) {
+      //   // Calculate the offset to center the text
+      //   double centerOffset = (maxWidth - textPainter.width) / 2 * 0.7;
+      //   textPainter.paint(canvas, Offset(centerOffset, currentHeight));
+      // } else if (textPainter.text?.toPlainText().contains("--") ?? false) {
+      //   // Calculate the offset to center the text
+      //   double centerOffset = (maxWidth - textPainter.width) / 2 * 0.3;
+      //   textPainter.paint(canvas, Offset(centerOffset, currentHeight));
+      // } else if (textPainter.text?.toPlainText().startsWith("300,000") ??
+      //     false) {
+      //   double rightOffset = maxWidth - textPainter.width - (maxWidth * 0.0);
+      //   textPainter.paint(canvas, Offset(rightOffset, currentHeight));
+      // } else {
+      textPainter.paint(canvas, Offset(0, currentHeight));
+      // }
       currentHeight += textPainter.height;
     }
 
@@ -581,9 +673,9 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
       'header': '14201167',
       'spbuname': 'SPBU AH NASUTION/TRITURA',
       'jl': 'JL. AH NASUTION/TRITURA NO. 6A',
-      'shift': 'Shift: 1     No. Trans: 5095616',
-      'waktu': 'Waktu: 27/03/2025 07:39:03',
-      'sepa1': '-----------------------------',
+      'shift': '1',
+      'Waktu': '27/03/2025 07:39:03',
+      'sepa1': '----------------------------------------',
       'Pulau/Pompa': '2',
       'Nama Produk': 'PERTALITE',
       'Harga/Liter': 'Rp. 10,000',
@@ -592,7 +684,7 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
       'Operator': 'ANDRI',
       'sepa2': '-----------------------------',
       'cash': 'CASH',
-      'cashvalue': '300,000',
+      'tunainya': '300,000',
       'sepa3': '-----------------------------',
       'No. Plat': 'BK1606AEC',
       'sepa4': '-----------------------------',
@@ -612,36 +704,36 @@ class _PertaminaFormScreenCustomState extends State<PertaminaFormScreenCustom> {
     // final bytenya = byteData?.buffer.asUint8List();
 
     if (bytenya != null) {
-      // showGeneralDialog(
-      //   context: context,
-      //   barrierDismissible: true,
-      //   barrierLabel: 'Close',
-      //   transitionDuration: const Duration(milliseconds: 200),
-      //   pageBuilder: (context, animation, secondaryAnimation) {
-      //     return GestureDetector(
-      //       onTap: () => Navigator.of(context).pop(),
-      //       child: Material(
-      //         color: Colors.white.withOpacity(0.9),
-      //         child: Center(
-      //           child: GestureDetector(
-      //             onTap: () {}, // Prevent dismiss when tapping the image itself
-      //             child: Image.memory(bytenya),
-      //           ),
-      //         ),
-      //       ),
-      //     );
-      //   },
-      // );
-      imgnya.Image? imageNya = imgnya.decodeImage(bytenya);
-      _bluetoothPrinterService.printer.printImageBytes(imageBytes);
-      bytes.addAll(generator.image(imageNya!));
-      // bytes.addAll(generator.feed(2));
-      // bytes.addAll(generator.cut());
-      _bluetoothPrinterService.printer.writeBytes(Uint8List.fromList(bytes));
-      // ui.decodeImageFromList(imageData, (ui.Image uiImg) {
-      //   // Convert the ui.Image to an image package Image
-      //   img.Image imagePackageImg = _convertUiImageToImagePackageImage(uiImg);
-      // });
+      showGeneralDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierLabel: 'Close',
+        transitionDuration: const Duration(milliseconds: 200),
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Material(
+              color: Colors.white.withOpacity(0.9),
+              child: Center(
+                child: GestureDetector(
+                  onTap: () {}, // Prevent dismiss when tapping the image itself
+                  child: Image.memory(bytenya),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+      // imgnya.Image? imageNya = imgnya.decodeImage(bytenya);
+      // _bluetoothPrinterService.printer.printImageBytes(imageBytes);
+      // bytes.addAll(generator.image(imageNya!));
+      // // bytes.addAll(generator.feed(2));
+      // // bytes.addAll(generator.cut());
+      // _bluetoothPrinterService.printer.writeBytes(Uint8List.fromList(bytes));
+      // // ui.decodeImageFromList(imageData, (ui.Image uiImg) {
+      // //   // Convert the ui.Image to an image package Image
+      // //   img.Image imagePackageImg = _convertUiImageToImagePackageImage(uiImg);
+      // // });
     }
   }
 }
